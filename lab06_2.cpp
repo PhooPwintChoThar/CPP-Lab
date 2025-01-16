@@ -85,7 +85,6 @@ int main() {
             }
         }
 
-        if (wordsPlayed >= 5) break;
     }
 
     cout << "Words played = " << wordsPlayed << endl;
