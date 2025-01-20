@@ -26,7 +26,7 @@ class PopulationGrowth {
             double increased= currentPopulation *(rate/100);
             increasedPopulation=currentPopulation+increased;
             cout<<fixed;
-            cout<<setw(7)<<left<<year<<setw(20)<<setprecision(0)<<currentPopulation<<setw(20)<<setprecision(0)<<increasedPopulation<<endl;
+            cout<<setw(7)<<left<<year<<setw(20)<<setprecision(0)<<currentPopulation<<setw(20)<<setprecision(0)<<increased<<endl;
             currentPopulation=increasedPopulation;
 
             if (doubledYear==-3 && currentPopulation>=initialPopulation*2){
