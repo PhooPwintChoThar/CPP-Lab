@@ -1,4 +1,5 @@
 #include<iostream>
+#include<iomanip>
 #include<string>
 using namespace std;
 
@@ -35,11 +36,11 @@ int main(){
     //Second output
     cout<<longer_bound2<<endl;
     cout<<middle_bound2<<endl;
-    cout<<'*'<<p1<<'*'<<endl;
+    cout<<'*'<<left<<setw(longer_bound2_size-2)<<p1<<'*'<<endl;
     cout<<middle_bound2<<endl;
     cout<<longer_bound2<<endl;
     cout<<middle_bound2<<endl;
-    cout<<'*'<<p2<<'*'<<endl;
+    cout<<'*'<<setw(longer_bound2_size-2)<<p2<<'*'<<endl;
     cout<<middle_bound2<<endl;
     cout<<longer_bound2<<endl;
 }
