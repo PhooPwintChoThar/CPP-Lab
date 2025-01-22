@@ -42,7 +42,5 @@ int main(){
     d.eat();
     d.sleep();
     d.bark();
-    char s='A';
-    char a= 'a';
     
 }
