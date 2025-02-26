@@ -1,0 +1,266 @@
+#include <iostream>
+#include <vector>
+#include <string>
+#include <cstdlib>
+#include <ctime>
+
+class Spacecraft {
+protected:
+    std::string name;
+    std::string propulsion;
+    int hullStrength;
+    int speed;
+
+public:
+    Spacecraft(const std::string& name, const std::string& propulsion, int hullStrength, int speed)
+        : name(name), propulsion(propulsion), hullStrength(hullStrength), speed(speed) {}
+
+    virtual void display() const {
+        std::cout << "Name: " << name << ", Propulsion: " << propulsion
+                  << ", Hull Strength: " << hullStrength << ", Speed: " << speed << std::endl;
+    }
+
+    int getHullStrength() const {
+        return hullStrength;
+    }
+};
+
+class AlienShip : public Spacecraft {
+private:
+    int evasionChance;
+
+public:
+    AlienShip(const std::string& name, const std::string& propulsion, int hullStrength, int speed, int evasionChance)
+        : Spacecraft(name, propulsion, hullStrength, speed), evasionChance(evasionChance) {}
+
+    void display() const override {
+        Spacecraft::display();
+        std::cout << "Evasion Chance: " << evasionChance << "%" << std::endl;
+    }
+
+    bool attemptFlee() const {
+        return (rand() % 100) < evasionChance;
+    }
+};
+
+class Scanner {
+private:
+    std::string name;
+    int range;
+
+public:
+    Scanner(const std::string& name, int range) : name(name), range(range) {}
+
+    bool scan(const AlienShip& ship) const {
+        return (rand() % 100) < range;
+    }
+
+    void display() const {
+        std::cout << "Scanner: " << name << ", Range: " << range << std::endl;
+    }
+};
+
+class TractorBeam {
+private:
+    std::string name;
+    int strength;
+
+public:
+    TractorBeam(const std::string& name, int strength) : name(name), strength(strength) {}
+
+    bool capture(const AlienShip& ship) const {
+        return (rand() % 100) < strength;
+    }
+
+    void display() const {
+        std::cout << "Tractor Beam: " << name << ", Strength: " << strength << std::endl;
+    }
+};
+
+class Galaxy {
+private:
+    std::vector<AlienShip> alienShips;
+
+public:
+    Galaxy() {
+        alienShips.push_back(AlienShip("Scout", "Ion Drive", 30, 80, 70));
+        alienShips.push_back(AlienShip("Fighter", "Plasma Thruster", 60, 50, 40));
+        alienShips.push_back(AlienShip("Frigate", "Warp Engine", 80, 30, 20));
+        alienShips.push_back(AlienShip("Drone", "Solar Sail", 20, 60, 60));
+        alienShips.push_back(AlienShip("Destroyer", "Fusion Core", 90, 40, 30));
+    }
+
+    AlienShip* explore() {
+        if ((rand() % 100) < 25 && !alienShips.empty()) {
+            int index = rand() % alienShips.size();
+            return &alienShips[index];
+        }
+        return nullptr;
+    }
+
+    void removeShip(const AlienShip& ship) {
+        for (auto it = alienShips.begin(); it != alienShips.end(); ++it) {
+            if (it->getHullStrength() == ship.getHullStrength()) {
+                alienShips.erase(it);
+                break;
+            }
+        }
+    }
+
+    bool isEmpty() const {
+        return alienShips.empty();
+    }
+};
+
+class Player {
+private:
+    std::vector<Scanner> scanners;
+    std::vector<AlienShip> fleet;
+    TractorBeam* tractorBeam;
+
+public:
+    Player() {
+        scanners.push_back(Scanner("Basic", 30));
+        scanners.push_back(Scanner("Enhanced", 50));
+        scanners.push_back(Scanner("LongRange", 70));
+        tractorBeam = nullptr;
+    }
+
+    void equipTractorBeam(const std::string& type) {
+        if (type == "Standard") {
+            tractorBeam = new TractorBeam("Standard", 40);
+        } else if (type == "Heavy") {
+            tractorBeam = new TractorBeam("Heavy", 70);
+        }
+    }
+
+    void displayInventory() const {
+        std::cout << "Scanners:" << std::endl;
+        for (const auto& scanner : scanners) {
+            scanner.display();
+        }
+        std::cout << "Fleet:" << std::endl;
+        for (const auto& ship : fleet) {
+            ship.display();
+        }
+        if (tractorBeam) {
+            tractorBeam->display();
+        }
+    }
+
+    bool scanAndCapture(AlienShip* ship, Galaxy& galaxy) {
+        if (scanners.empty()) {
+            std::cout << "No scanners left!" << std::endl;
+            return false;
+        }
+
+        Scanner scanner = scanners.back();
+        scanners.pop_back();
+
+        if (scanner.scan(*ship)) {
+            std::cout << "Scan successful!" << std::endl;
+            if (tractorBeam && tractorBeam->capture(*ship)) {
+                std::cout << "Capture successful!" << std::endl;
+                fleet.push_back(*ship);
+                galaxy.removeShip(*ship);
+                return true;
+            } else {
+                std::cout << "Capture failed!" << std::endl;
+                if (ship->attemptFlee()) {
+                    std::cout << "Ship fled!" << std::endl;
+                    galaxy.removeShip(*ship);
+                }
+            }
+        } else {
+            std::cout << "Scan failed!" << std::endl;
+            if (ship->attemptFlee()) {
+                std::cout << "Ship fled!" << std::endl;
+                galaxy.removeShip(*ship);
+            }
+        }
+        return false;
+    }
+
+    bool hasScanners() const {
+        return !scanners.empty();
+    }
+
+    int getFleetSize() const {
+        return fleet.size();
+    }
+};
+
+int main() {
+    srand(static_cast<unsigned int>(time(0)));
+    Galaxy galaxy;
+    Player player;
+    bool playing = true;
+
+    while (playing) {
+        std::cout << "Choose action: 1. Explore, 2. Equip Tractor Beam, 3. Inventory, 4. Quit" << std::endl;
+        int choice;
+        std::cin >> choice;
+
+        switch (choice) {
+            case 1: {
+                AlienShip* ship = galaxy.explore();
+                if (ship) {
+                    std::cout << "Encountered: ";
+                    ship->display();
+                    std::cout << "Choose action: 1. Scan, 2. Equip Tractor Beam" << std::endl;
+                    int action;
+                    std::cin >> action;
+                    if (action == 1) {
+                        player.scanAndCapture(ship, galaxy);
+                    } else if (action == 2) {
+                        std::cout << "Choose Tractor Beam type: 1. Standard, 2. Heavy" << std::endl;
+                        int beamChoice;
+                        std::cin >> beamChoice;
+                        if (beamChoice == 1) {
+                            player.equipTractorBeam("Standard");
+                        } else if (beamChoice == 2) {
+                            player.equipTractorBeam("Heavy");
+                        }
+                    }
+                } else {
+                    std::cout << "No encounter." << std::endl;
+                }
+                break;
+            }
+            case 2: {
+                std::cout << "Choose Tractor Beam type: 1. Standard, 2. Heavy" << std::endl;
+                int beamChoice;
+                std::cin >> beamChoice;
+                if (beamChoice == 1) {
+                    player.equipTractorBeam("Standard");
+                } else if (beamChoice == 2) {
+                    player.equipTractorBeam("Heavy");
+                }
+                break;
+            }
+            case 3: {
+                player.displayInventory();
+                break;
+            }
+            case 4: {
+                playing = false;
+                break;
+            }
+            default: {
+                std::cout << "Invalid choice." << std::endl;
+                break;
+            }
+        }
+
+        if (galaxy.isEmpty()) {
+            std::cout << "Congratulations! You captured all ships!" << std::endl;
+            playing = false;
+        } else if (!player.hasScanners()) {
+            std::cout << "You ran out of scanners. Game over!" << std::endl;
+            playing = false;
+        }
+    }
+
+    player.displayInventory();
+    return 0;
+}
