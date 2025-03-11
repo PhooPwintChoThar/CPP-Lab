@@ -33,7 +33,7 @@ class Textbook : public Book {
 
     public:
 
-    Textbook( string bid , double fine , string s) : Book(bid, fine), subject(s){};
+    Textbook( string bid , double fine , string s) : Book(bid, fine), subject(s){}
         
 
     double calculateFine  (int daysOverdue) override {
