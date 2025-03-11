@@ -3,96 +3,76 @@
 #include<vector>
 using namespace std;
 
-
 class Book {
     protected:
+    string id ;
+    double fineRate;
 
-    string id;
-    double fineRate=0.00;
 
     public:
 
-    Book( string bid , double fine): id(bid) , fineRate(fine){
-
-    }
+    Book ( string bookId , double fine):id(bookId), fineRate(fine){}
 
     virtual double calculateFine( int daysOverdue){
-        return daysOverdue*fineRate;
+        return fineRate;
     }
 
-    virtual void displayInfo(){
-        cout<<"Book id : "<<id<<endl;
-
+    virtual void displayInfo (){
+        cout<<"Book (ID :"<<id<<")"<<endl;
+        cout<<"Fine Rate : $"<<fineRate<<endl;
     }
+
 };
 
-class Textbook : public Book {
 
-    private:
+class Textbook : public Book {
     string subject;
 
     public:
+    Textbook ( string bookId , double fine , string sub): subject(sub) , Book(bookId, fine){}
 
-    Textbook( string bid , double fine , string s) : Book(bid, fine), subject(s){}
-        
-
-    double calculateFine  (int daysOverdue) override {
-        double pay=fineRate+0.5 *daysOverdue ;
-        return pay;
+    double calculateFine(int daysOverdue) override {
+        return fineRate + (0.5 * daysOverdue); 
     }
 
-    void displayInfo() override{
-        cout<<"TextBook id : "<<id<<endl;
-        cout<<"Basic Fine rate : "<<fineRate<<endl;
+    void displayInfo () override {
+        cout<<"Textbook (ID: "<<id<<")"<<endl;
+        cout<<"Fine Rate : $"<<fineRate<<endl;
         cout<<"Subject : "<<subject<<endl;
-
     }
+
 };
 
 class Novel : public Book {
-
-    private:
-    string genere;
+    string genre;
 
     public:
-    Novel( string bid , double fine , string g) : Book(bid, fine) , genere(g) { }
+    Novel ( string bookId , double fine , string gen): genre(gen) , Book(bookId, fine){}
 
-    double calculateFine  (int daysOverdue) override {
-        double pay=fineRate+0.2 *daysOverdue ;
-        return pay;
+    double calculateFine (int daysOverdue) override {
+
+        return fineRate + (0.2 * daysOverdue); 
+
     }
 
-    void displayInfo() override{
-        cout<<"Novel id : "<<id<<endl;
-        cout<<"Basic Fine rate : "<<fineRate<<endl;
-        cout<<"Genere : "<<genere<<endl;
-
+    void displayInfo () override {
+        cout<<"Novel Book  (ID: "<<id<<")"<<endl;
+        cout<<"Fine Rate : $"<<fineRate<<endl;
+        cout<<"Genre : "<<genre<<endl;
     }
 
 
 };
 
-double calculateFine (Book* b , int days){
-   double f= b->calculateFine(days);
-   return f;
-}
-
-void displayBook( Book* b){
-    b->displayInfo();
-}
 
 int main(){
-    vector<Book*> bookList={ new Textbook ("T001" , 1 , "Physics") , new Novel("N001" , 0.5 , "Mystery")};
+    vector<Book *> books = {new Textbook("T001", 1 , "Physics") , new Novel ("N001" , 0.5 , "Mystery")};
     cout<<"Library Book System"<<endl;
-    cout<<"----------------------"<<endl;
-
-    for(auto book :bookList ){
-        displayBook(book);
-        cout<<"Fine for 5 days overdue : "<<calculateFine(book, 5)<<endl;
-        cout<<"------------------------------"<<endl;
+    cout<<"--------------------------------------"<<endl;
+    for(auto book : books){
+    book->displayInfo();
+    cout<<"Fine for 5 days overdue : $"<<book->calculateFine(5)<<endl;
+    cout<<"--------------------------------------"<<endl;
     }
-
-
-
-
 }
+
